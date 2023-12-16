@@ -1,8 +1,9 @@
-use std::collections::HashMap;
 use std::string::ToString;
 
 use super::day::Day;
 use anyhow::Result;
+use smallvec::SmallVec;
+use smallvec::smallvec;
 
 fn hash_code(input: &str) -> usize {
     let mut val = 0;
@@ -30,15 +31,12 @@ impl Day for Day15 {
         codes.iter().map(|code| hash_code(code)).sum()
     }
     fn second(codes: Self::Parsed) -> Self::Output {
-        let mut boxes: HashMap<usize, Vec<(String, usize)>> = HashMap::new();
-        for i in 0..256 {
-            boxes.insert(i, Vec::new());
-        }
+        let mut boxes: SmallVec<[SmallVec<[(String, usize); 16]>; 256]> = SmallVec::from_elem(smallvec![], 256);
 
         for code in codes {
             let (label, focal_length) = code.split_once(&['-', '='][..]).unwrap();
             let hash = hash_code(label);
-            let boxx = boxes.get_mut(&hash).unwrap();
+            let boxx = boxes.get_mut(hash).unwrap();
             if code.contains('=') {
                 let focal_length = focal_length.parse().unwrap();
                 if let Some(slot) = boxx.iter_mut().find(|(find_label, _)| find_label == label) {
@@ -52,9 +50,9 @@ impl Day for Day15 {
                 boxx.retain(|(find_label, _)| label != find_label);
             }
         }
-        
+
         boxes
-            .values()
+            .iter()
             .map(|boxx| {
                 boxx.iter()
                     .enumerate()
