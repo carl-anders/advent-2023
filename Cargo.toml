@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.12"
-#pathfinding = "4.0"
+pathfinding = "4.0"
 smallvec = "1.7"
 anyhow = "1.0"
 #ahash = "0.8"
