@@ -31,7 +31,8 @@ impl Day for Day15 {
         codes.iter().map(|code| hash_code(code)).sum()
     }
     fn second(codes: Self::Parsed) -> Self::Output {
-        let mut boxes: SmallVec<[SmallVec<[(String, usize); 16]>; 256]> = SmallVec::from_elem(smallvec![], 256);
+        type Box = SmallVec<[(String, usize); 16]>;
+        let mut boxes: SmallVec<[Box; 256]> = SmallVec::from_elem(smallvec![], 256);
 
         for code in codes {
             let (label, focal_length) = code.split_once(&['-', '='][..]).unwrap();
