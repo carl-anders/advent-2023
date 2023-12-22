@@ -41,7 +41,7 @@ fn visited_gardens(start: Pos, grid: &Array2<Ground>, steps: &[usize]) -> Vec<us
         panic!()
     };
     let (height, width) = (height as isize, width as isize);
-    
+
     let max_steps = *steps.iter().max().unwrap();
     let mut results = vec![0; steps.len()];
 
@@ -149,7 +149,11 @@ mod tests {
         assert_eq!(Day21::first(parsed()), 2665);
     }
     #[test]
-    fn part2() {
-        assert_eq!(Day21::second(parsed()), 2665);
+    fn example_garden_list() {
+        let (start_pos, grid) = parsed();
+        assert_eq!(
+            visited_gardens(start_pos, &grid, &[6, 10, 50, 100]),
+            [16, 50, 1594, 6536]
+        );
     }
 }
