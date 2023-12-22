@@ -21,6 +21,7 @@ num-traits = "0.2"
 num-integer = "0.1"
 serde_json = "1.0"
 enum-map = "2.7.3"
+polyfit-rs = "0.2.1"
 
 [profile.release]
 lto = "fat"
