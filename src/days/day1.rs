@@ -6,7 +6,7 @@ use anyhow::Result;
 pub struct Day1;
 impl Day for Day1 {
     type Parsed = String;
-    type Output = i32;
+    type Output = usize;
 
     fn parse(input: String) -> Result<Self::Parsed> {
         Ok(input)
@@ -16,13 +16,13 @@ impl Day for Day1 {
             .lines()
             .map(|line| {
                 let mut it = line.chars().filter(char::is_ascii_digit);
-                let first = it.next().unwrap();
+                let first = it.next().unwrap().to_digit(10).unwrap();
                 let last = if let Some(last) = it.next_back() {
-                    last
+                    last.to_digit(10).unwrap()
                 } else {
                     first
                 };
-                format!("{first}{last}").parse::<i32>().unwrap()
+                (first * 10 + last) as usize
             })
             .sum()
     }
@@ -34,9 +34,9 @@ impl Day for Day1 {
             .lines()
             .map(|line| {
                 let mut fl = FirstAndLast::new();
-                for pos in 0..usize::MAX {
+                for pos in 0..(line.len()) {
                     let slice = &line[pos..];
-                    if let Some(char) = slice.chars().next() {
+                    let char = slice.chars().next().unwrap();
                         match char {
                             '0'..='9' => {
                                 fl.push(char.to_digit(10).unwrap() as usize);
@@ -49,12 +49,9 @@ impl Day for Day1 {
                                 }
                             }
                         }
-                    } else {
-                        break;
-                    }
                 }
                 let (first, last) = fl.get().unwrap();
-                format!("{first}{last}").parse::<i32>().unwrap()
+                first * 10 + last
             })
             .sum()
     }

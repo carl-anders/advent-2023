@@ -1,6 +1,7 @@
 use super::day::Day;
 use anyhow::Result;
 use itertools::Itertools;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 #[derive(Debug, Clone)]
 pub struct Race {
@@ -51,7 +52,7 @@ impl Day for Day6 {
             .product()
     }
     fn second((_, race): Self::Parsed) -> Self::Output {
-        (1..race.time)
+        (1..race.time).into_par_iter()
             .map(|speed| {
                 let time_left = race.time - speed;
                 time_left * speed

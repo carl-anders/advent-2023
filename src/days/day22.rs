@@ -7,6 +7,7 @@ use crate::helpers::grid2d::Position2D;
 
 use super::day::Day;
 use anyhow::Result;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 type Pos2D = Position2D<usize>;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -89,6 +90,7 @@ impl BrickLayer {
     }
     fn total_cascades(&self) -> usize {
         (0..self.len)
+            .into_par_iter()
             .filter(|origin| self.preserve.contains(origin))
             .map(|origin| {
                 let mut support_map: HashMap<usize, usize> = HashMap::new();

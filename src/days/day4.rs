@@ -1,11 +1,8 @@
-use std::collections::HashMap;
-
 use super::day::Day;
 use anyhow::Result;
 
 #[derive(Debug, Clone)]
 pub struct Card {
-    id: usize,
     winning: Vec<u8>,
     numbers: Vec<u8>,
 }
@@ -19,12 +16,10 @@ impl Day for Day4 {
         Ok(input
             .lines()
             .map(|line| {
-                let (id, numbers) = line.split_once(':').unwrap();
-                let id = id.rsplit_once(' ').unwrap().1.parse().unwrap();
+                let (_, numbers) = line.split_once(':').unwrap();
 
                 let (winning, numbers) = numbers.split_once('|').unwrap();
                 Card {
-                    id,
                     winning: winning.split(' ').filter_map(|n| n.parse().ok()).collect(),
                     numbers: numbers.split(' ').filter_map(|n| n.parse().ok()).collect(),
                 }
@@ -52,9 +47,9 @@ impl Day for Day4 {
     fn second(cards: Self::Parsed) -> Self::Output {
         let mut sum = 0;
 
-        let mut copies: HashMap<usize, usize> = HashMap::new();
-        for card in &cards {
-            let self_copies = *copies.get(&card.id).unwrap_or(&0);
+        let mut copies = vec![0; cards.len()];
+        for (id, card) in cards.iter().enumerate() {
+            let self_copies = copies[id];
             sum += 1 + self_copies;
 
             let found = card
@@ -64,8 +59,10 @@ impl Day for Day4 {
                 .count();
             if found > 0 {
                 for i in 1..=found {
-                    let id = card.id + i;
-                    *copies.entry(id).or_default() += 1 + self_copies;
+                    let copy_id = id + i;
+                    if copy_id < copies.len() {
+                        copies[copy_id] += 1 + self_copies;
+                    }
                 }
             }
         }

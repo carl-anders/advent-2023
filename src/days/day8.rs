@@ -5,6 +5,7 @@ use crate::helpers::grid2d::Turn;
 use super::day::Day;
 use anyhow::Result;
 use num_integer::Integer;
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
 
 #[derive(Debug, Clone)]
 pub struct Input {
@@ -57,7 +58,7 @@ impl Day for Day8 {
             .cloned()
             .map(|s| (s, 0))
             .collect();
-        for (position, steps) in &mut positions {
+        positions.par_iter_mut().for_each(|(position, steps)| {
             for turn in input.path.iter().cycle() {
                 if position.ends_with('Z') {
                     break;
@@ -69,7 +70,7 @@ impl Day for Day8 {
                     *position = input.nodes.get(position).unwrap().1.clone();
                 }
             }
-        }
+        });
         positions.iter().fold(1, |acc, (_, steps)| acc.lcm(steps))
     }
 }

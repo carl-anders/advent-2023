@@ -1,48 +1,47 @@
-use enum_map::enum_map;
-use enum_map::Enum;
-
 use super::day::Day;
 use anyhow::Result;
 
 #[derive(Clone, Debug)]
 pub struct Game {
-    plays: Vec<Vec<(u32, Color)>>,
-    id: u32,
+    plays: Vec<Play>,
+    id: usize,
 }
-#[derive(Clone, Copy, Debug, Enum)]
-pub enum Color {
-    Red,
-    Green,
-    Blue,
+#[derive(Clone, Copy, Debug)]
+pub struct Play {
+    red: usize,
+    green: usize,
+    blue: usize,
 }
 pub struct Day2;
 impl Day for Day2 {
     type Parsed = Vec<Game>;
-    type Output = u32;
+    type Output = usize;
 
     fn parse(input: String) -> Result<Self::Parsed> {
         Ok(input
             .lines()
             .map(|line| {
                 let (id, games) = line.split_once(": ").unwrap();
-                let id = id.split(' ').find_map(|s| s.parse::<u32>().ok()).unwrap();
+                let id = id.split(' ').find_map(|s| s.parse::<usize>().ok()).unwrap();
                 let games = games
                     .split("; ")
                     .map(|set| {
-                        set.split(", ")
-                            .map(|one| {
-                                let (num, color) = one.split_once(' ').unwrap();
-                                (
-                                    num.parse::<u32>().unwrap(),
-                                    match color {
-                                        "red" => Color::Red,
-                                        "green" => Color::Green,
-                                        "blue" => Color::Blue,
-                                        _ => panic!(),
-                                    },
-                                )
-                            })
-                            .collect()
+                        let mut play = Play {
+                            red: 0,
+                            green: 0,
+                            blue: 0,
+                        };
+                        for one in set.split(", ") {
+                            let (num, color) = one.split_once(' ').unwrap();
+                            let num = num.parse::<usize>().unwrap();
+                            match color {
+                                "red" => play.red = num,
+                                "green" => play.green = num,
+                                "blue" => play.blue = num,
+                                _ => panic!(),
+                            }
+                        }
+                        play
                     })
                     .collect();
                 Game { plays: games, id }
@@ -53,13 +52,10 @@ impl Day for Day2 {
         games
             .iter()
             .filter(|game| {
-                !game.plays.iter().any(|play| {
-                    play.iter().any(|(num, color)| match color {
-                        Color::Red => *num > 12,
-                        Color::Green => *num > 13,
-                        Color::Blue => *num > 14,
-                    })
-                })
+                !game
+                    .plays
+                    .iter()
+                    .any(|play| play.red > 12 || play.green > 13 || play.blue > 14)
             })
             .map(|game| game.id)
             .sum()
@@ -68,19 +64,13 @@ impl Day for Day2 {
         games
             .iter()
             .map(|game| {
-                let mut min = enum_map! {
-                    Color::Red => 0,
-                    Color::Green => 0,
-                    Color::Blue => 0
-                };
-                for play in &game.plays {
-                    for &(num, color) in play {
-                        if min[color] < num {
-                            min[color] = num;
-                        }
-                    }
-                }
-                min.values().product::<u32>()
+                [
+                    game.plays.iter().map(|play| play.red).max().unwrap(),
+                    game.plays.iter().map(|play| play.green).max().unwrap(),
+                    game.plays.iter().map(|play| play.blue).max().unwrap(),
+                ]
+                .iter()
+                .product::<usize>()
             })
             .sum()
     }
